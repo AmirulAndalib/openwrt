@@ -31,16 +31,18 @@ Signed-off-by: Weijie Gao <weijie.gao@mediatek.com>
 
 --- a/drivers/mtd/Kconfig
 +++ b/drivers/mtd/Kconfig
-@@ -226,4 +226,6 @@ source "drivers/mtd/spi/Kconfig"
+@@ -282,6 +282,8 @@ source "drivers/mtd/ubi/Kconfig"
  
- source "drivers/mtd/ubi/Kconfig"
+ source "drivers/mtd/nvmxip/Kconfig"
  
 +source "drivers/mtd/nmbm/Kconfig"
 +
+ endif
+ 
  endmenu
 --- a/drivers/mtd/Makefile
 +++ b/drivers/mtd/Makefile
-@@ -40,3 +40,4 @@ obj-$(CONFIG_SPL_UBI) += ubispl/
+@@ -42,3 +42,4 @@ obj-$(CONFIG_SPL_UBI) += ubispl/
  endif
  
  obj-$(CONFIG_MTK_SPI_NAND) += mtk-snand/
@@ -750,7 +752,7 @@ Signed-off-by: Weijie Gao <weijie.gao@mediatek.com>
 +	addr = ba2addr(ni, ba);
 +
 +	for (off = 0; off < ni->lower.erasesize; off += ni->lower.writesize) {
-+		WATCHDOG_RESET();
++		schedule();
 +
 +		ret = nmbm_read_phys_page(ni, addr + off, ni->page_cache, NULL,
 +					  NMBM_MODE_PLACE_OOB);
@@ -789,7 +791,7 @@ Signed-off-by: Weijie Gao <weijie.gao@mediatek.com>
 +	bool success;
 +
 +	while (ba < limit) {
-+		WATCHDOG_RESET();
++		schedule();
 +
 +		if (nmbm_get_block_state(ni, ba) != BLOCK_ST_GOOD)
 +			goto next_block;
@@ -840,7 +842,7 @@ Signed-off-by: Weijie Gao <weijie.gao@mediatek.com>
 +	addr = ba2addr(ni, ba);
 +
 +	for (off = 0; off < ni->lower.erasesize; off += ni->lower.writesize) {
-+		WATCHDOG_RESET();
++		schedule();
 +
 +		/* Prepare page data. fill 0xff to unused region */
 +		memcpy(ni->page_cache, data, size);
@@ -884,7 +886,7 @@ Signed-off-by: Weijie Gao <weijie.gao@mediatek.com>
 +	bool success;
 +
 +	while (ba > limit) {
-+		WATCHDOG_RESET();
++		schedule();
 +
 +		if (nmbm_get_block_state(ni, ba) != BLOCK_ST_GOOD)
 +			goto next_block;
@@ -939,7 +941,7 @@ Signed-off-by: Weijie Gao <weijie.gao@mediatek.com>
 +	int ret;
 +
 +	while (sizeremain) {
-+		WATCHDOG_RESET();
++		schedule();
 +
 +		leading = off & ni->writesize_mask;
 +		chunksize = ni->lower.writesize - leading;
@@ -989,7 +991,7 @@ Signed-off-by: Weijie Gao <weijie.gao@mediatek.com>
 +	int ret;
 +
 +	while (sizeremain) {
-+		WATCHDOG_RESET();
++		schedule();
 +
 +		leading = off & ni->writesize_mask;
 +		chunksize = ni->lower.writesize - leading;
@@ -1045,7 +1047,7 @@ Signed-off-by: Weijie Gao <weijie.gao@mediatek.com>
 +	bool success;
 +
 +	while (sizeremain && ba < limit) {
-+		WATCHDOG_RESET();
++		schedule();
 +
 +		chunksize = sizeremain;
 +		if (chunksize > ni->lower.erasesize)
@@ -1307,7 +1309,7 @@ Signed-off-by: Weijie Gao <weijie.gao@mediatek.com>
 +
 +	/* Try to write new info table next to the existing table */
 +	while (write_ba >= ni->mapping_blocks_ba) {
-+		WATCHDOG_RESET();
++		schedule();
 +
 +		success = nmbm_write_info_table(ni, write_ba,
 +						ni->mapping_blocks_top_ba,
@@ -1426,7 +1428,7 @@ Signed-off-by: Weijie Gao <weijie.gao@mediatek.com>
 +
 +	/* Try to write temporary info table into spare unmapped blocks */
 +	while (write_ba >= ni->mapping_blocks_ba) {
-+		WATCHDOG_RESET();
++		schedule();
 +
 +		success = nmbm_write_info_table(ni, write_ba,
 +						ni->mapping_blocks_top_ba,
@@ -1512,7 +1514,7 @@ Signed-off-by: Weijie Gao <weijie.gao@mediatek.com>
 +
 +	/* Write new backup info table. */
 +	while (write_ba >= main_table_end_ba) {
-+		WATCHDOG_RESET();
++		schedule();
 +
 +		success = nmbm_write_info_table(ni, write_ba,
 +						ni->mapping_blocks_top_ba,
@@ -1901,7 +1903,7 @@ Signed-off-by: Weijie Gao <weijie.gao@mediatek.com>
 +	int ret;
 +
 +	while (sizeremain && ba < limit) {
-+		WATCHDOG_RESET();
++		schedule();
 +
 +		if (nmbm_get_block_state(ni, ba) != BLOCK_ST_GOOD)
 +			goto next_block;
@@ -1994,7 +1996,7 @@ Signed-off-by: Weijie Gao <weijie.gao@mediatek.com>
 +	bool success;
 +
 +	while (ba < limit - size2blk(ni, ni->info_table_size)) {
-+		WATCHDOG_RESET();
++		schedule();
 +
 +		success = nmbm_try_load_info_table(ni, ba, table_end_ba,
 +						   write_count,
@@ -2206,7 +2208,7 @@ Signed-off-by: Weijie Gao <weijie.gao@mediatek.com>
 +		limit = block_count - ni->lower.max_reserved_blocks;
 +
 +	while (ba >= limit) {
-+		WATCHDOG_RESET();
++		schedule();
 +
 +		ba--;
 +		addr = ba2addr(ni, ba);
@@ -2220,7 +2222,7 @@ Signed-off-by: Weijie Gao <weijie.gao@mediatek.com>
 +		 */
 +		for (off = 0; off < ni->lower.erasesize;
 +		     off += ni->lower.writesize) {
-+			WATCHDOG_RESET();
++			schedule();
 +
 +			ret = nmbn_read_data(ni, addr + off, &sig,
 +					     sizeof(sig));
@@ -2592,7 +2594,7 @@ Signed-off-by: Weijie Gao <weijie.gao@mediatek.com>
 +	end_ba = addr2ba(ni, addr + size - 1);
 +
 +	while (start_ba <= end_ba) {
-+		WATCHDOG_RESET();
++		schedule();
 +
 +		ret = nmbm_erase_logic_block(ni, start_ba);
 +		if (ret) {
@@ -2724,7 +2726,7 @@ Signed-off-by: Weijie Gao <weijie.gao@mediatek.com>
 +	}
 +
 +	while (sizeremain) {
-+		WATCHDOG_RESET();
++		schedule();
 +
 +		leading = off & ni->writesize_mask;
 +		chunksize = ni->lower.writesize - leading;
@@ -2891,7 +2893,7 @@ Signed-off-by: Weijie Gao <weijie.gao@mediatek.com>
 +	}
 +
 +	while (sizeremain) {
-+		WATCHDOG_RESET();
++		schedule();
 +
 +		leading = off & ni->writesize_mask;
 +		chunksize = ni->lower.writesize - leading;

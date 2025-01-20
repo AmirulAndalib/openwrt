@@ -28,6 +28,9 @@ config BUSYBOX_DEFAULT_FEATURE_COMPRESS_USAGE
 config BUSYBOX_DEFAULT_LFS
 	bool
 	default y
+config BUSYBOX_DEFAULT_TIME64
+	bool
+	default n
 config BUSYBOX_DEFAULT_PAM
 	bool
 	default n
@@ -208,6 +211,15 @@ config BUSYBOX_DEFAULT_PASSWORD_MINLEN
 config BUSYBOX_DEFAULT_MD5_SMALL
 	int
 	default 1
+config BUSYBOX_DEFAULT_SHA1_SMALL
+	int
+	default 3
+config BUSYBOX_DEFAULT_SHA1_HWACCEL
+	bool
+	default y
+config BUSYBOX_DEFAULT_SHA256_HWACCEL
+	bool
+	default y
 config BUSYBOX_DEFAULT_SHA3_SMALL
 	int
 	default 1
@@ -243,10 +255,10 @@ config BUSYBOX_DEFAULT_FEATURE_EDITING_HISTORY
 	default 256
 config BUSYBOX_DEFAULT_FEATURE_EDITING_SAVEHISTORY
 	bool
-	default n
+	default y
 config BUSYBOX_DEFAULT_FEATURE_EDITING_SAVE_ON_EXIT
 	bool
-	default n
+	default y
 config BUSYBOX_DEFAULT_FEATURE_REVERSE_SEARCH
 	bool
 	default n
@@ -298,6 +310,15 @@ config BUSYBOX_DEFAULT_UNICODE_NEUTRAL_TABLE
 config BUSYBOX_DEFAULT_UNICODE_PRESERVE_BROKEN
 	bool
 	default n
+config BUSYBOX_DEFAULT_LOOP_CONFIGURE
+	bool
+	default n
+config BUSYBOX_DEFAULT_NO_LOOP_CONFIGURE
+	bool
+	default n
+config BUSYBOX_DEFAULT_TRY_LOOP_CONFIGURE
+	bool
+	default y
 config BUSYBOX_DEFAULT_FEATURE_SEAMLESS_XZ
 	bool
 	default n
@@ -860,6 +881,9 @@ config BUSYBOX_DEFAULT_TRUNCATE
 	bool
 	default y if TARGET_bcm53xx
 	default n
+config BUSYBOX_DEFAULT_TSORT
+	bool
+	default n
 config BUSYBOX_DEFAULT_TTY
 	bool
 	default n
@@ -961,7 +985,7 @@ config BUSYBOX_DEFAULT_RESET
 	default y
 config BUSYBOX_DEFAULT_RESIZE
 	bool
-	default n
+	default y
 config BUSYBOX_DEFAULT_FEATURE_RESIZE_PRINT
 	bool
 	default n
@@ -1160,6 +1184,9 @@ config BUSYBOX_DEFAULT_FEATURE_FIND_EXEC
 config BUSYBOX_DEFAULT_FEATURE_FIND_EXEC_PLUS
 	bool
 	default n
+config BUSYBOX_DEFAULT_FEATURE_FIND_EXEC_OK
+	bool
+	default n
 config BUSYBOX_DEFAULT_FEATURE_FIND_USER
 	bool
 	default y
@@ -1312,7 +1339,7 @@ config BUSYBOX_DEFAULT_USE_BB_CRYPT
 	default n
 config BUSYBOX_DEFAULT_USE_BB_CRYPT_SHA
 	bool
-	default n
+	default y
 config BUSYBOX_DEFAULT_ADD_SHELL
 	bool
 	default n
@@ -1345,7 +1372,7 @@ config BUSYBOX_DEFAULT_CHPASSWD
 	default n
 config BUSYBOX_DEFAULT_FEATURE_DEFAULT_PASSWD_ALGO
 	string
-	default "md5"
+	default "sha256"
 config BUSYBOX_DEFAULT_CRYPTPW
 	bool
 	default n
@@ -1780,7 +1807,7 @@ config BUSYBOX_DEFAULT_FEATURE_SETPRIV_CAPABILITY_NAMES
 	default n
 config BUSYBOX_DEFAULT_SETSID
 	bool
-	default n
+	default y
 config BUSYBOX_DEFAULT_SWAPON
 	bool
 	default y
@@ -1801,13 +1828,13 @@ config BUSYBOX_DEFAULT_SWITCH_ROOT
 	default y
 config BUSYBOX_DEFAULT_TASKSET
 	bool
-	default n
+	default y
 config BUSYBOX_DEFAULT_FEATURE_TASKSET_FANCY
 	bool
-	default n
+	default y
 config BUSYBOX_DEFAULT_FEATURE_TASKSET_CPULIST
 	bool
-	default n
+	default y
 config BUSYBOX_DEFAULT_UEVENT
 	bool
 	default n
@@ -2030,6 +2057,9 @@ config BUSYBOX_DEFAULT_FLASH_UNLOCK
 config BUSYBOX_DEFAULT_FLASHCP
 	bool
 	default n
+config BUSYBOX_DEFAULT_GETFATTR
+	bool
+	default n
 config BUSYBOX_DEFAULT_HDPARM
 	bool
 	default n
@@ -2162,6 +2192,9 @@ config BUSYBOX_DEFAULT_RUNLEVEL
 config BUSYBOX_DEFAULT_RX
 	bool
 	default n
+config BUSYBOX_DEFAULT_SEEDRNG
+	bool
+	default n
 config BUSYBOX_DEFAULT_SETFATTR
 	bool
 	default n
@@ -2174,6 +2207,9 @@ config BUSYBOX_DEFAULT_STRINGS
 config BUSYBOX_DEFAULT_TIME
 	bool
 	default y
+config BUSYBOX_DEFAULT_TREE
+	bool
+	default n
 config BUSYBOX_DEFAULT_TS
 	bool
 	default n
@@ -2430,6 +2466,9 @@ config BUSYBOX_DEFAULT_FEATURE_IP_ADDRESS
 config BUSYBOX_DEFAULT_FEATURE_IP_LINK
 	bool
 	default y
+config BUSYBOX_DEFAULT_FEATURE_IP_LINK_CAN
+	bool
+	default n
 config BUSYBOX_DEFAULT_FEATURE_IP_ROUTE
 	bool
 	default y
@@ -2655,6 +2694,9 @@ config BUSYBOX_DEFAULT_ZCIP
 config BUSYBOX_DEFAULT_UDHCPD
 	bool
 	default n
+config BUSYBOX_DEFAULT_FEATURE_UDHCPD_BOOTP
+	bool
+	default n
 config BUSYBOX_DEFAULT_FEATURE_UDHCPD_BASE_IP_ON_MAC
 	bool
 	default n
@@ -2682,6 +2724,9 @@ config BUSYBOX_DEFAULT_FEATURE_UDHCPC_SANITIZEOPT
 config BUSYBOX_DEFAULT_UDHCPC_DEFAULT_SCRIPT
 	string
 	default "/usr/share/udhcpc/default.script"
+config BUSYBOX_DEFAULT_UDHCPC6_DEFAULT_SCRIPT
+	string
+	default ""
 config BUSYBOX_DEFAULT_UDHCPC6
 	bool
 	default n
@@ -2993,7 +3038,7 @@ config BUSYBOX_DEFAULT_ASH_ALIAS
 	default y
 config BUSYBOX_DEFAULT_ASH_RANDOM_SUPPORT
 	bool
-	default n
+	default y
 config BUSYBOX_DEFAULT_ASH_EXPAND_PRMT
 	bool
 	default y

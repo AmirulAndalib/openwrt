@@ -53,7 +53,8 @@ aruba,ap-303)
 aruba,ap-365)
 	ubootenv_add_uci_config "/dev/mtd8" "0x0" "0x10000" "0x10000"
 	;;
-buffalo,wtr-m2133hp)
+buffalo,wtr-m2133hp|\
+netgear,lbr20)
 	ubootenv_add_uci_config "/dev/mtd8" "0x0" "0x40000" "0x20000"
 	;;
 linksys,ea6350v3)
@@ -63,8 +64,14 @@ linksys,ea8300|\
 linksys,mr8300)
 	ubootenv_add_uci_config "/dev/mtd7" "0x0" "0x40000" "0x20000"
 	;;
-linksys,whw01-v1)
+linksys,whw01)
 	ubootenv_add_uci_config "/dev/mtd6" "0x0" "0x40000" "0x10000"
+	;;
+linksys,whw03)
+        ubootenv_add_uci_config "/dev/mmcblk0p11" "0x0" "0x100000"
+        ;;
+linksys,whw03v2)
+	ubootenv_add_uci_config "/dev/mtd6" "0x0" "0x80000" "0x20000"
 	;;
 zyxel,nbg6617)
 	ubootenv_add_uci_config "/dev/mtd6" "0x0" "0x10000" "0x10000"

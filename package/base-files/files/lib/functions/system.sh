@@ -61,11 +61,21 @@ find_mtd_chardev() {
 	echo "${INDEX:+$PREFIX$INDEX}"
 }
 
+get_mac_ascii() {
+	local part="$1"
+	local key="$2"
+	local mac_dirty
+
+	mac_dirty=$(strings "$part" | tr -d ' \t' | sed -n 's/^'"$key"'=//p' | head -n 1)
+
+	# "canonicalize" mac
+	[ -n "$mac_dirty" ] && macaddr_canonicalize "$mac_dirty"
+}
+
 mtd_get_mac_ascii() {
 	local mtdname="$1"
 	local key="$2"
 	local part
-	local mac_dirty
 
 	part=$(find_mtd_part "$mtdname")
 	if [ -z "$part" ]; then
@@ -73,10 +83,7 @@ mtd_get_mac_ascii() {
 		return
 	fi
 
-	mac_dirty=$(strings "$part" | sed -n 's/^'"$key"'=//p')
-
-	# "canonicalize" mac
-	[ -n "$mac_dirty" ] && macaddr_canonicalize "$mac_dirty"
+	get_mac_ascii "$part" "$key"
 }
 
 mtd_get_mac_encrypted_arcadyan() {
@@ -129,11 +136,22 @@ mtd_get_mac_encrypted_deco() {
 	echo $macaddr
 }
 
+mtd_get_mac_uci_config_ubi() {
+	local volumename="$1"
+
+	. /lib/upgrade/nand.sh
+
+	local ubidev=$(nand_attach_ubi $CI_UBIPART)
+	local part=$(nand_find_volume $ubidev $volumename)
+
+	cat "/dev/$part" | sed -n 's/^\s*option macaddr\s*'"'"'\?\([0-9A-F:]\+\)'"'"'\?/\1/Ip'
+}
+
 mtd_get_mac_text() {
-	local mtdname=$1
-	local offset=$(($2))
+	local mtdname="$1"
+	local offset=$((${2:-0}))
+	local length="${3:-17}"
 	local part
-	local mac_dirty
 
 	part=$(find_mtd_part "$mtdname")
 	if [ -z "$part" ]; then
@@ -141,15 +159,9 @@ mtd_get_mac_text() {
 		return
 	fi
 
-	if [ -z "$offset" ]; then
-		echo "mtd_get_mac_text: offset missing!" >&2
-		return
-	fi
+	[ $((offset + length)) -le $(mtd_get_part_size "$mtdname") ] || return
 
-	mac_dirty=$(dd if="$part" bs=1 skip="$offset" count=17 2>/dev/null)
-
-	# "canonicalize" mac
-	[ -n "$mac_dirty" ] && macaddr_canonicalize "$mac_dirty"
+	macaddr_canonicalize $(dd bs=1 if="$part" skip="$offset" count="$length" 2>/dev/null)
 }
 
 mtd_get_mac_binary() {
@@ -185,6 +197,20 @@ mtd_get_part_size() {
 	done < /proc/mtd
 }
 
+mmc_get_mac_ascii() {
+	local part_name="$1"
+	local key="$2"
+	local part
+
+	part=$(find_mmc_part "$part_name")
+	if [ -z "$part" ]; then
+		echo "mmc_get_mac_ascii: partition $part_name not found!" >&2
+		return
+	fi
+
+	get_mac_ascii "$part" "$key"
+}
+
 mmc_get_mac_binary() {
 	local part_name="$1"
 	local offset="$2"
@@ -202,6 +228,14 @@ macaddr_add() {
 
 	nic=$(printf "%06x" $((0x${nic//:/} + val & 0xffffff)) | sed 's/^\(.\{2\}\)\(.\{2\}\)\(.\{2\}\)/\1:\2:\3/')
 	echo $oui:$nic
+}
+
+macaddr_generate_from_mmc_cid() {
+	local mmc_dev=$1
+
+	local sd_hash=$(sha256sum /sys/class/block/$mmc_dev/device/cid)
+	local mac_base=$(macaddr_canonicalize "$(echo "${sd_hash}" | dd bs=1 count=12 2>/dev/null)")
+	echo "$(macaddr_unsetbit_mc "$(macaddr_setbit_la "${mac_base}")")"
 }
 
 macaddr_geteui() {
@@ -243,12 +277,6 @@ macaddr_random() {
 	local randsrc=$(get_mac_binary /dev/urandom 0)
 	
 	echo "$(macaddr_unsetbit_mc "$(macaddr_setbit_la "${randsrc}")")"
-}
-
-macaddr_2bin() {
-	local mac=$1
-
-	echo -ne \\x${mac//:/\\x}
 }
 
 macaddr_canonicalize() {

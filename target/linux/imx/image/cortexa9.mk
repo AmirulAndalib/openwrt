@@ -52,6 +52,29 @@ define Build/apalis-emmc
 	$(Build/imx-combined-image-clean)
 endef
 
+define Build/ventana-img
+	rm -rf $@.boot
+	mkdir -p $@.boot/boot
+	$(CP) $(IMAGE_KERNEL) $@.boot/boot/uImage
+	$(foreach dts,$(DEVICE_DTS), \
+		$(CP) \
+			$(DTS_DIR)/$(dts).dtb \
+			$@.boot/boot/;
+	)
+	mkimage -A arm -O linux -T script -C none -a 0 -e 0 \
+		-n '$(DEVICE_ID) OpenWrt bootscript' \
+		-d bootscript-$(DEVICE_NAME) \
+		$@.boot/boot/6x_bootscript-ventana
+	cp $@ $@.fs
+
+	$(SCRIPT_DIR)/gen_image_generic.sh $@ \
+		$(CONFIG_TARGET_KERNEL_PARTSIZE) \
+		$@.boot \
+		$(CONFIG_TARGET_ROOTFS_PARTSIZE) \
+		$@.fs \
+		1024
+	$(Build/imx-combined-image-clean)
+endef
 
 define Device/Default
   PROFILES := Default
@@ -61,6 +84,7 @@ define Device/Default
   KERNEL_NAME := zImage
   KERNEL := kernel-bin | uImage none
   KERNEL_LOADADDR := 0x10008000
+  DTS_DIR := $(DTS_DIR)/nxp/imx
   IMAGES :=
 endef
 
@@ -97,12 +121,14 @@ define Device/gateworks_ventana
 	imx6q-gw5913
   DEVICE_PACKAGES := kmod-sky2 kmod-sound-core kmod-sound-soc-imx \
 	kmod-sound-soc-imx-sgtl5000 kmod-can kmod-can-flexcan kmod-can-raw \
-	kmod-hwmon-gsc kmod-leds-gpio kmod-pps-gpio kobs-ng
+	kmod-hwmon-gsc kmod-leds-gpio kmod-pps-gpio kobs-ng \
+	kmod-gpio-button-hotplug
   KERNEL += | boot-overlay
-  IMAGES := nand.ubi bootfs.tar.gz dtb
+  IMAGES := img.gz nand.ubi bootfs.tar.gz dtb
   IMAGE/nand.ubi := append-ubi
   IMAGE/bootfs.tar.gz := bootfs.tar.gz
   IMAGE/dtb := install-dtb
+  IMAGE/img.gz := append-rootfs | pad-extra 128k | ventana-img | gzip
   UBINIZE_PARTS = boot=$$(KDIR_KERNEL_IMAGE).boot.ubifs=15
   PAGESIZE := 2048
   BLOCKSIZE := 128k

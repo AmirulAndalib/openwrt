@@ -8,13 +8,13 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=ppfe
-PKG_VERSION:=21.08
-PKG_RELEASE:=$(AUTORELEASE)
+PKG_VERSION:=6.6.3.1.0.0
+PKG_RELEASE:=1
 
 PKG_SOURCE_PROTO:=git
-PKG_SOURCE_URL:=https://github.com/NXP/qoriq-engine-pfe-bin.git
-PKG_SOURCE_VERSION:=LSDK-21.08
-PKG_MIRROR_HASH:=f2591b12bc02dbfcf113dcb79cce2fc703d8492b7309ad75b3c4915b76966c64
+PKG_SOURCE_URL:=https://github.com/nxp-qoriq/qoriq-engine-pfe-bin
+PKG_SOURCE_VERSION:=lf-6.6.3-1.0.0
+PKG_MIRROR_HASH:=836da0d1ace6c5896c434940b5f06ae9ddcb871959e9f5aa3df75d67e39aec41
 
 PKG_FLAGS:=nonshared
 

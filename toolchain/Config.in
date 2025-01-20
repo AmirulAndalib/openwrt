@@ -97,6 +97,7 @@ menuconfig EXTERNAL_TOOLCHAIN
 		default "arm-unknown-linux-gnu"      if arm
 		default "armeb-unknown-linux-gnu"    if armeb
 		default "i486-unknown-linux-gnu"     if i386
+		default "loongarch64-unknown-linux-gnu" if loongarch64
 		default "mips-unknown-linux-gnu"     if mips
 		default "mipsel-unknown-linux-gnu"   if mipsel
 		default "powerpc-unknown-linux-gnu"  if powerpc
@@ -111,6 +112,7 @@ menuconfig EXTERNAL_TOOLCHAIN
 		default "arm-unknown-linux-gnu-"      if arm
 		default "armeb-unknown-linux-gnu-"    if armeb
 		default "i486-unknown-linux-gnu-"     if i386
+		default "loongarch64-unknown-linux-gnu-" if loongarch64
 		default "mips-unknown-linux-gnu-"     if mips
 		default "mipsel-unknown-linux-gnu-"   if mipsel
 		default "powerpc-unknown-linux-gnu-"  if powerpc
@@ -125,6 +127,7 @@ menuconfig EXTERNAL_TOOLCHAIN
 		default "/opt/cross/arm-unknown-linux-gnu"      if arm
 		default "/opt/cross/armeb-unknown-linux-gnu"    if armeb
 		default "/opt/cross/i486-unknown-linux-gnu"     if i386
+		default "/opt/cross/loongarch64-unknown-linux-gnu" if loongarch64
 		default "/opt/cross/mips-unknown-linux-gnu"     if mips
 		default "/opt/cross/mipsel-unknown-linux-gnu"   if mipsel
 		default "/opt/cross/powerpc-unknown-linux-gnu"  if powerpc
@@ -149,6 +152,14 @@ menuconfig EXTERNAL_TOOLCHAIN
 			select USE_MUSL
 
 	endchoice
+
+	config EXTERNAL_GCC_VERSION
+		string
+		prompt "External Toolchain GCC Version" if DEVEL
+		depends on EXTERNAL_TOOLCHAIN && !NATIVE_TOOLCHAIN
+		help
+		  Manually specify the GCC version used by the selected
+		  external toolchain.
 
 	config TOOLCHAIN_LIBC
 		string
@@ -197,7 +208,6 @@ menuconfig EXTRA_TARGET_ARCH
 	bool
 	prompt "Enable an extra toolchain target architecture" if TOOLCHAINOPTS
 	depends on !sparc
-	default n
 	help
 	  Some builds may require a 'biarch' toolchain. This option
 	  allows you to specify an additional target arch.
@@ -252,7 +262,6 @@ config DWARVES
 	bool
 	prompt "Build pahole" if TOOLCHAINOPTS
 	depends on !HOST_OS_MACOS
-	default n
 	help
 	  Enable if you want to build pahole and the dwarves tools.
 
